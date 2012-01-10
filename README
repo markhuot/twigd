@@ -1,0 +1,5 @@
+Invoked with
+    
+    php twig /path/to/twig/base/dir
+
+It will take any *.twig file and convert it into a *.html file.
