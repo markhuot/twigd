@@ -13,3 +13,9 @@ twig will then go and find any *.twig files and convert them into their corrospo
 Ignoring Files
 --------------
 To have Twig ignore a file simply preface the filename with an underscore (_). So, _base.twig would not be converted. This is useful if you have oage templates, like index.twig, that extend or include sub templates, such as _base.twig.
+
+Variable Support
+----------------
+To pass variables into your templates simply specify them as named parmeters to the command (prefaced with the double hyphen). So, if I wanted to pass in some personal information I would run:
+
+    $ php twig --name="mark" --age="16" /path/to/twig/base/dir
