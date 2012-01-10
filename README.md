@@ -12,7 +12,7 @@ twig will then go and find any *.twig files and convert them into their corrospo
 
 Ignoring Files
 --------------
-To have Twig ignore a file simply preface the filename with an underscore (_). So, _base.twig would not be converted. This is useful if you have oage templates, like index.twig, that extend or include sub templates, such as _base.twig.
+To have Twig ignore a file simply preface the filename with an underscore (_). So, _base.twig would not be converted. This is useful if you have page templates, like index.twig, that extend or include sub templates, such as _base.twig.
 
 Variable Support
 ----------------
