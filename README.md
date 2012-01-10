@@ -1,10 +1,10 @@
 Twig is a modern template engine for PHP.
 
-`twig` is a command line watcher for Twig that converts a directory of Twig files into rendered HTML files. It is invoked like so:
+**twig** is a command line watcher for Twig that converts a directory of Twig files into rendered HTML files. It is invoked like so:
     
-    php twig /path/to/twig/base/dir
+    $ php twig /path/to/twig/base/dir
 
-`twig` will then go and find any *.twig files and convert them into their corrosponding *.html files. With the support of the entire Twig parser you can use variables, filters, includes, extends, etc…
+**twig** will then go and find any *.twig files and convert them into their corrosponding *.html files. With the support of the entire Twig parser you can use variables, filters, includes, extends, etc…
 
 Ignoring Files
 --------------
