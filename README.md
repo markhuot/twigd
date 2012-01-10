@@ -1,5 +1,5 @@
 * **Twig** is a modern template engine for PHP.
-* **twig** is a command line watcher for Twig that converts a directory of Twig files into rendered HTML files.
+* **twig** is a command line tool which monitors a directory of Twig files and converts them into rendered HTML files.
 
 It is invoked like so:
     
