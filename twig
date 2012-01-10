@@ -1,0 +1,81 @@
+#!/usr/bin/php
+<?php
+
+require_once rtrim(__DIR__, '/').'/lib/Twig/Autoloader.php';
+Twig_Autoloader::register();
+
+// Set our base directory
+$basedir = rtrim(realpath($argv[1]), '/').'/';
+
+// No base dir?! Error!
+if (!$basedir) {
+	die("Please set a base directory. Try `php twig /path/to/templates`\n");
+}
+
+// Load Twig
+$loader = new Twig_Loader_Filesystem($basedir);
+$twig = new Twig_Environment($loader);
+
+// Build a list of files
+function add_files($dir, &$files) {
+	if ($handle = opendir($dir)) {
+		while (false !== ($entry = readdir($handle))) {
+			if (preg_match('/^\./', $entry)) {
+				continue;
+			}
+		    else if (is_dir($dir.$entry)) {
+		    	add_files($dir.$entry.'/', $files);
+		    }
+		    else if (preg_match('/^[^_].*\.twig$/', $entry)) {
+		    	$files[$dir.$entry] = filemtime($dir.$entry);
+		    }
+		}
+
+		closedir($handle);
+	}
+}
+
+// Store the state of the files from the last loop
+$last_files = array();
+
+// Start watching… I'm so sorry for this…
+while (true) {
+
+	// Get the updated list of files
+	$current_files = array();
+	add_files($basedir, $current_files);
+
+	// Compare our arrays and determine what has changed
+	$modified = array_diff_assoc($current_files, $last_files);
+	$deleted = array_diff_key($last_files, $current_files);
+
+	// Re-render any updated or new files
+	foreach ($modified as $file => $mtime) {
+		$relative_file = relative_file_name($file);
+		$rendered_file = rendered_file_name($file);
+		$rendered_contents = $twig->render($relative_file, array());
+		file_put_contents($rendered_file, $rendered_contents);
+		echo "U {$relative_file}\n";
+	}
+
+	// Delete any old files
+	foreach ($deleted as $file => $mtime) {
+		$relative_file = relative_file_name($file);
+		$rendered_file = rendered_file_name($file);
+		@unlink($rendered_file);
+		echo "D {$relative_file}\n";
+	}
+
+	// Do it all again
+	$last_files = $current_files;
+	sleep(1);
+}
+
+function relative_file_name($file) {
+	global $basedir;
+	return preg_replace('/^'.preg_quote($basedir, '/').'/', '', $file);
+}
+
+function rendered_file_name($file) {
+	return preg_replace('/\.twig$/', '.html', $file);
+}
