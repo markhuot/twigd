@@ -5,7 +5,15 @@ require_once rtrim(__DIR__, '/').'/lib/Twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
 
 // Set our base directory
-$basedir = rtrim(realpath($argv[1]), '/').'/';
+$basedir = rtrim(realpath(array_pop($argv)), '/').'/';
+
+// Get the variables
+$vars = array();
+foreach ($argv as $arg) {
+	if (preg_match('/--(\w+)=(.*)$/', $arg, $pair)) {
+		$vars[$pair[1]] = $pair[2];
+	}
+}
 
 // No base dir?! Error!
 if (!$basedir) {
@@ -53,7 +61,7 @@ while (true) {
 	foreach ($modified as $file => $mtime) {
 		$relative_file = relative_file_name($file);
 		$rendered_file = rendered_file_name($file);
-		$rendered_contents = $twig->render($relative_file, array());
+		$rendered_contents = $twig->render($relative_file, $vars);
 		file_put_contents($rendered_file, $rendered_contents);
 		echo "U {$relative_file}\n";
 	}
