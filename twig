@@ -1,8 +1,13 @@
 #!/usr/bin/php
 <?php
 
+// Load Twig
 require_once rtrim(__DIR__, '/').'/lib/Twig/lib/Twig/Autoloader.php';
 Twig_Autoloader::register();
+
+// Load our custom loader, this has to come after Twig because we're extending
+// a base Twig class.
+require_once 'FleetingFilesystem.php';
 
 // Set our base directory
 $basedir = rtrim(realpath(array_pop($argv)), '/').'/';
@@ -16,12 +21,15 @@ foreach ($argv as $arg) {
 }
 
 // No base dir?! Error!
+if (!is_dir($basedir)) {
+	die("You must provide a base directory, not a filename.\n");
+}
 if (!$basedir) {
-	die("Please set a base directory. Try `php twig /path/to/templates`\n");
+	die("Please set a base directory. Try `php twig /path/to/templates`.\n");
 }
 
 // Load Twig
-$loader = new Twig_Loader_Filesystem($basedir);
+$loader = new Twig_Loader_FleetingFilesystem($basedir);
 $twig = new Twig_Environment($loader);
 
 // Build a list of files
@@ -49,6 +57,10 @@ $last_files = array();
 // Start watching… I'm so sorry for this…
 while (true) {
 
+	// Refresh our caches
+	$twig->clearCacheFiles();
+	$twig->clearTemplateCache();
+
 	// Get the updated list of files
 	$current_files = array();
 	add_files($basedir, $current_files);
@@ -62,8 +74,9 @@ while (true) {
 		$relative_file = relative_file_name($file);
 		$rendered_file = rendered_file_name($file);
 		$rendered_contents = $twig->render($relative_file, $vars);
+		$flag = file_exists($rendered_file) ? 'U' : 'C';
 		file_put_contents($rendered_file, $rendered_contents);
-		echo "U {$relative_file}\n";
+		echo "{$flag} {$relative_file}\n";
 	}
 
 	// Delete any old files
