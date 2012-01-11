@@ -57,10 +57,6 @@ $last_files = array();
 // Start watching… I'm so sorry for this…
 while (true) {
 
-	// Refresh our caches
-	$twig->clearCacheFiles();
-	$twig->clearTemplateCache();
-
 	// Get the updated list of files
 	$current_files = array();
 	add_files($basedir, $current_files);
