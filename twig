@@ -12,6 +12,8 @@ require_once 'FleetingFilesystem.php';
 // Set our base directory
 $basedir = rtrim(realpath(array_pop($argv)), '/').'/';
 
+echo "Monitoring: {$basedir}\n";
+
 // Get the variables
 $vars = array();
 foreach ($argv as $arg) {
@@ -69,10 +71,19 @@ while (true) {
 	foreach ($modified as $file => $mtime) {
 		$relative_file = relative_file_name($file);
 		$rendered_file = rendered_file_name($file);
-		$rendered_contents = $twig->render($relative_file, $vars);
-		$flag = file_exists($rendered_file) ? 'U' : 'C';
-		file_put_contents($rendered_file, $rendered_contents);
-		echo "{$flag} {$relative_file}\n";
+		
+		// Try our render
+		try {
+			$rendered_contents = $twig->render($relative_file, $vars);
+			$flag = file_exists($rendered_file) ? 'U' : 'C';
+			file_put_contents($rendered_file, $rendered_contents);
+			echo "{$flag} {$relative_file}\n";
+		}
+		
+		// Catch any errors
+		catch (Exception $e) {
+			echo "\033[31mE {$e->getRawMessage()} ({$e->getTemplateFile()}:{$e->getTemplateLine()})\033[0m\n";
+		}
 	}
 
 	// Delete any old files
@@ -85,6 +96,18 @@ while (true) {
 
 	// Do it all again
 	$last_files = $current_files;
+
+	// Release some memory
+	unset($current_files);
+	unset($modified);
+	unset($deleted);
+	unset($relative_file);
+	unset($rendered_file);
+	unset($rendered_contents);
+	unset($flag);
+	unset($e);
+
+	// Pause to breathe
 	sleep(1);
 }
 
