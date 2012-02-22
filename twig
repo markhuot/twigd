@@ -12,8 +12,6 @@ require_once 'FleetingFilesystem.php';
 // Set our base directory
 $basedir = rtrim(realpath(array_pop($argv)), '/').'/';
 
-echo "Monitoring: {$basedir}\n";
-
 // Get the variables
 $vars = array();
 foreach ($argv as $arg) {
@@ -29,6 +27,9 @@ if (!is_dir($basedir)) {
 if (!$basedir) {
 	die("Please set a base directory. Try `php twig /path/to/templates`.\n");
 }
+
+// Notify user
+echo "Monitoring: {$basedir}\n";
 
 // Load Twig
 $loader = new Twig_Loader_FleetingFilesystem($basedir);
@@ -74,7 +75,8 @@ while (true) {
 		
 		// Try our render
 		try {
-			$rendered_contents = $twig->render($relative_file, $vars);
+			$template = $twig->loadTemplate($relative_file);
+			$rendered_contents = $template->render($vars);
 			$flag = file_exists($rendered_file) ? 'U' : 'C';
 			file_put_contents($rendered_file, $rendered_contents);
 			echo "{$flag} {$relative_file}\n";
