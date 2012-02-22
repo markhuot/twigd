@@ -79,7 +79,7 @@ while (true) {
 			$rendered_contents = $template->render($vars);
 			$flag = file_exists($rendered_file) ? 'U' : 'C';
 			file_put_contents($rendered_file, $rendered_contents);
-			echo "{$flag} {$relative_file}\n";
+			echo "\033[32m{$flag} {$relative_file}\033[0m\n";
 		}
 		
 		// Catch any errors
