@@ -31,10 +31,6 @@ if (!$basedir) {
 // Notify user
 echo "Monitoring: {$basedir}\n";
 
-// Load Twig
-$loader = new Twig_Loader_FleetingFilesystem($basedir);
-$twig = new Twig_Environment($loader);
-
 // Build a list of files
 function add_files($dir, &$files) {
 	if ($handle = opendir($dir)) {
@@ -70,6 +66,14 @@ while (true) {
 
 	// Re-render any updated or new files
 	foreach ($modified as $file => $mtime) {
+		
+		// Load Twig
+		$loader = new Twig_Loader_FleetingFilesystem($basedir);
+		$twig = new Twig_Environment($loader);
+
+		// Clear caches
+		Twig_Template::clearCache();
+
 		$relative_file = relative_file_name($file);
 		$rendered_file = rendered_file_name($file);
 		
